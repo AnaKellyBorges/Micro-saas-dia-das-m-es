@@ -45,81 +45,70 @@ async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
 
     poemaElemento.innerText = mensagem;
 
-    // LÓGICA DE FOTO RESILIENTE V3
-    if (arquivoFoto) {
-        // Plano A: Tentar o Conversor/Canvas (Limpa CMYK, orienta, comprime)
+  if (arquivoFoto) {
         try {
-            console.log("Tentando sanitização via Canvas...");
-            const fotoSanificada = await converterParaJpegResiliente(arquivoFoto);
-            if (fotoSanificada && fotoSanificada.length > 100) { // Verifica se não voltou vazio
-                imgElemento.src = fotoSanificada;
-            } else {
-                throw new Error("Canvas falhou ou voltou vazio");
-            }
-        } catch (error) {
-            // Plano B: Backup Rápido (URL.createObjectURL)
-            // Se o canvas travar (comum em JPG de 10MB+ no iOS), usamos o arquivo bruto
-            console.warn("Canvas bloqueado ou falhou, usando backup bruto.", error);
-            const urlTemporaria = URL.createObjectURL(arquivoFoto);
-            imgElemento.src = urlTemporaria;
-
-            // Gerencia memória: Revoga a URL quando carregar
-            imgElemento.onload = () => URL.revokeObjectURL(urlTemporaria);
+            console.log("Iniciando sanitização com limite de tempo...");
+            
+            // Corrida: Se o conversor demorar mais de 3s, ele pula pro 'catch'
+            const fotoProcessada = await Promise.race([
+                converterParaJpeg(arquivoFoto),
+                new Promise((_, reject) => setTimeout(() => reject("Tempo esgotado"), 3000))
+            ]);
+            
+            imgElemento.src = fotoProcessada;
+        } catch (erro) {
+            console.warn("Canvas falhou ou demorou. Usando backup.", erro);
+            // Backup: Cria uma URL direta do arquivo sem converter
+            imgElemento.src = URL.createObjectURL(arquivoFoto);
         }
-    } else {
-        // Plano C: Imagem padrão
-        imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
+        imgElemento.style.display = "block";
     }
 
-    const telaForm = document.getElementById('tela-formulario');
-    const telaResult = document.getElementById('resultado');
+    // --- TROCA DE TELAS (A MARRETA) ---
+    // Forçamos o sumiço da entrada e o aparecimento do resultado
+    const telaEntrada = document.getElementById('tela-entrada');
+    const telaResultado = document.getElementById('resultado');
 
-    if (telaForm) {
-        telaForm.style.display = 'none'; // Some com o formulário e o título
+    if (telaEntrada) {
+        telaEntrada.style.setProperty('display', 'none', 'important');
     }
-
-    if (telaResult) {
-        telaResult.classList.remove('escondido');
-        telaResult.style.display = 'flex'; // Faz o cartão aparecer centralizado
-        telaResult.scrollIntoView({ behavior: 'smooth' }); // Faz a tela subir para o topo do cartão
-
+    
+    if (telaResultado) {
+        telaResultado.classList.remove('hidden');
+        telaResultado.style.setProperty('display', 'block', 'important');
+    }
     // Configura botões (Igual antes)
     document.getElementById('btnWhatsapp').onclick = () => compartilharCartao(nomeMae, mensagem);
     document.getElementById('btnApoiar').onclick = () => document.getElementById('modalPix').classList.remove('escondido');
 }
 
 // CONVERSOR RESILIENTE (Com tratamento de erro rigoroso)
-function converterParaJpegResiliente(arquivo) {
+function converterParaJpeg(arquivo) {
     return new Promise((resolve, reject) => {
-        // Tempo limite de 5 segundos para não travar o site
-        const timeout = setTimeout(() => reject("Tempo limite de conversão excedido"), 5000);
-
         const leitor = new FileReader();
         leitor.onload = (e) => {
             const img = new Image();
             img.onload = () => {
-                clearTimeout(timeout); // Limpa o tempo limite se der certo
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
+                const max = 800; // Limite razoável
+                let w = img.width, h = img.height;
 
-                // Redimensiona agressivamente para garantir que o Canvas abra no celular (max 600px)
-                const escala = Math.min(1, 600 / Math.max(img.width, img.height));
-                canvas.width = img.width * escala;
-                canvas.height = img.height * escala;
+                if (w > h && w > max) { h *= max / w; w = max; }
+                else if (h > max) { w *= max / h; h = max; }
 
-                // Tenta desenhar. Se falhar aqui, o 'catch' da exibirCartao pega.
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                // Qualidade baixa (0.6) para garantir leveza
-                resolve(canvas.toDataURL('image/jpeg', 0.6));
+                canvas.width = w; canvas.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', 0.8));
             };
-            img.onerror = () => { clearTimeout(timeout); reject("Erro ao carregar Image()"); };
+            img.onerror = () => reject("Erro ao carregar imagem no objeto Image");
             img.src = e.target.result;
         };
-        leitor.onerror = () => { clearTimeout(timeout); reject("Erro no FileReader"); };
+        leitor.onerror = () => reject("Erro ao ler arquivo");
         leitor.readAsDataURL(arquivo);
     });
 }
+
 
 // (Função compartilharCartao e fecharModal continuam iguais)
 async function compartilharCartao(nomeMae, mensagem) {
