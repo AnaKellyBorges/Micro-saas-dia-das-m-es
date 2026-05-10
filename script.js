@@ -43,41 +43,63 @@ formulario.addEventListener('submit', async function (evento) {
     }
 });
 
-function exibirCartao(nomeMae, mensagem, arquivoFoto) {
-    // Esconde o formulário e mostra o resultado
-    document.querySelector('.container').classList.add('hidden');
-    document.querySelector('header').classList.add('hidden');
-    document.getElementById('resultado').classList.remove('hidden');
-
-    document.getElementById('poemaGerado').innerText = mensagem;
-
+// Nova versão da função com 'async' para poder esperar a imagem
+async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
+    
+    // 1. Pegamos os elementos
+    const containerForm = document.querySelector('.container');
+    const header = document.querySelector('header');
+    const secaoResultado = document.getElementById('resultado');
+    const poemaElemento = document.getElementById('poemaGerado');
     const imgElemento = document.getElementById('fotoExibida');
 
-    // CORREÇÃO DO BUG DA IMAGEM:
+    // 2. Colocamos o texto (isso é rápido)
+    poemaElemento.innerText = mensagem;
+
+    // 3. Lógica da Foto (Ajustada para Celular)
     if (arquivoFoto) {
-        const leitor = new FileReader();
-        leitor.onload = function (e) {
-            // AQUI ESTAVA O ERRO: Faltava atribuir o resultado ao src
-            imgElemento.src = e.target.result;
+        try {
+            // Criamos uma "Promessa" de leitura de arquivo
+            const lerArquivo = (arquivo) => {
+                return new Promise((resolve, reject) => {
+                    const leitor = new FileReader();
+                    leitor.onload = (e) => resolve(e.target.result); // Sucesso
+                    leitor.onerror = (erro) => reject(erro);       // Falha
+                    leitor.readAsDataURL(arquivo);
+                });
+            };
+
+            // AGORA NÓS ESPERAMOS (await) a foto ser lida completamente
+            const imagemBase64 = await lerArquivo(arquivoFoto);
+            
+            // Só colocamos no src depois de ler tudo
+            imgElemento.src = imagemBase64;
             imgElemento.style.display = "block";
-        };
-        leitor.readAsDataURL(arquivoFoto);
+
+        } catch (erro) {
+            console.error("Erro ao ler foto no celular:", erro);
+            // Backup se a foto falhar
+            imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
+        }
     } else {
-        // Imagem padrão caso não envie foto
+        // Imagem padrão se não houver upload
         imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
         imgElemento.style.display = "block";
     }
 
-    // CONFIGURAÇÃO DO BOTÃO WHATSAPP (COM IMAGEM + LINK)
+    // 4. SÓ AGORA mostramos o resultado na tela
+    // Isso garante que quando o cartão aparecer, a foto já estará lá.
+    containerForm.classList.add('hidden');
+    header.classList.add('hidden');
+    secaoResultado.classList.remove('hidden');
+
+    // 5. Configurações dos botões (PIX, Zap, etc) - Igual antes
     const btnZap = document.getElementById('btnWhatsapp');
     btnZap.onclick = () => compartilharCartao(nomeMae, mensagem);
 
-    // CONFIGURAÇÃO DO MODAL PIX
     const btnApoiar = document.getElementById('btnApoiar');
     const modal = document.getElementById('modalPix');
-
     btnApoiar.onclick = () => modal.classList.remove('hidden');
-    window.fecharModal = () => modal.classList.add('hidden');
 }
 
 // FUNÇÃO DE COMPARTILHAR CORRIGIDA
