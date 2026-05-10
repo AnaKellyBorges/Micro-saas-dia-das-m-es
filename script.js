@@ -57,31 +57,19 @@ async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
     poemaElemento.innerText = mensagem;
 
     // 3. Lógica da Foto (Ajustada para Celular)
-    if (arquivoFoto) {
-        try {
-            // Criamos uma "Promessa" de leitura de arquivo
-            const lerArquivo = (arquivo) => {
-                return new Promise((resolve, reject) => {
-                    const leitor = new FileReader();
-                    leitor.onload = (e) => resolve(e.target.result); // Sucesso
-                    leitor.onerror = (erro) => reject(erro);       // Falha
-                    leitor.readAsDataURL(arquivo);
-                });
-            };
-
-            // AGORA NÓS ESPERAMOS (await) a foto ser lida completamente
-            const imagemBase64 = await lerArquivo(arquivoFoto);
-            
-            // Só colocamos no src depois de ler tudo
-            imgElemento.src = imagemBase64;
-            imgElemento.style.display = "block";
-
-        } catch (erro) {
-            console.error("Erro ao ler foto no celular:", erro);
-            // Backup se a foto falhar
-            imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
-        }
-    } else {
+   // Dentro de exibirCartao...
+if (arquivoFoto) {
+    try {
+        // O código vai parar aqui, converter a foto e guardar o resultado em 'fotoLimpa'
+        const fotoLimpa = await converterParaJpeg(arquivoFoto);
+        
+        imgElemento.src = fotoLimpa; // Usa a versão convertida e leve
+        imgElemento.style.display = "block";
+    } catch (erro) {
+        console.error("Erro ao converter:", erro);
+        imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
+    }
+} else {
         // Imagem padrão se não houver upload
         imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
         imgElemento.style.display = "block";
@@ -130,4 +118,43 @@ async function compartilharCartao(nomeMae, mensagem) {
         alert("Não foi possível compartilhar a imagem. Enviando apenas o link.");
         window.open(`https://api.whatsapp.com/send?text=Veja meu cartão: ${linkSite}`);
     }
+}
+
+async function converterParaJpeg(arquivo) {
+    return new Promise((resolve) => {
+        const leitor = new FileReader();
+        leitor.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                // Criamos um canvas (palco invisível)
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // Redimensionamos para não ficar pesado (máximo 1080px)
+                let largura = img.width;
+                let altura = img.height;
+                const max = 1080;
+
+                if (largura > altura && largura > max) {
+                    altura *= max / largura;
+                    largura = max;
+                } else if (altura > max) {
+                    largura *= max / altura;
+                    altura = max;
+                }
+
+                canvas.width = largura;
+                canvas.height = altura;
+
+                // Desenhamos a imagem no canvas
+                ctx.drawImage(img, 0, 0, largura, altura);
+
+                // Convertemos para JPEG com 80% de qualidade
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                resolve(dataUrl);
+            };
+            img.src = e.target.result;
+        };
+        leitor.readAsDataURL(arquivo);
+    });
 }
