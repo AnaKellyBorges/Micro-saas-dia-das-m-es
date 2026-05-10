@@ -2,7 +2,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY); // Isso é para back-end
-const genAI = new GoogleGenerativeAI(API_KEY);
 const modelo = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 // 1. Primeiro, capturamos o formulário pelo ID que está no seu HTML
