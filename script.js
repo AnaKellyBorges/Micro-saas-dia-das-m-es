@@ -1,4 +1,5 @@
 
+// --- script.js V3: Robusto para Produção ---
 const formulario = document.getElementById('cardForm');
 
 formulario.addEventListener('submit', async function (evento) {
@@ -14,7 +15,6 @@ formulario.addEventListener('submit', async function (evento) {
     botao.disabled = true;
 
     try {
-        // 1. Chamada para a API na Vercel
         const respostaServidor = await fetch('/api/gerar-cartao', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -26,54 +26,98 @@ formulario.addEventListener('submit', async function (evento) {
         const dados = await respostaServidor.json();
         
         if (dados.texto) {
-            // 2. Chama a exibição (a conversão de foto acontece lá dentro agora)
+            // Chamamos a exibição com 'await' para segurar o loading
             await exibirCartao(nomeMae, dados.texto, arquivoFoto);
         }
 
     } catch (erro) {
         console.error("Erro geral:", erro);
-        alert("Houve um erro. Verifique sua conexão e tente novamente.");
+        alert("Ops, algo deu errado. Tente novamente em breve.");
     } finally {
         botao.innerText = "Gerar Cartão com IA";
         botao.disabled = false;
     }
 });
 
-// FUNÇÃO DE EXIBIÇÃO (Com conversor embutido e seguro)
 async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
     const imgElemento = document.getElementById('fotoExibida');
     const poemaElemento = document.getElementById('poemaGerado');
 
     poemaElemento.innerText = mensagem;
 
-    // Tentativa de processar a foto
+    // LÓGICA DE FOTO RESILIENTE V3
     if (arquivoFoto) {
+        // Plano A: Tentar o Conversor/Canvas (Limpa CMYK, orienta, comprime)
         try {
-            console.log("Iniciando conversão de imagem...");
-            const fotoConvertida = await converterParaJpeg(arquivoFoto);
-            imgElemento.src = fotoConvertida;
-            imgElemento.style.display = "block";
-        } catch (e) {
-            console.warn("Falha na conversão, usando imagem padrão", e);
-            imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
-            imgElemento.style.display = "block";
+            console.log("Tentando sanitização via Canvas...");
+            const fotoSanificada = await converterParaJpegResiliente(arquivoFoto);
+            if (fotoSanificada && fotoSanificada.length > 100) { // Verifica se não voltou vazio
+                imgElemento.src = fotoSanificada;
+            } else {
+                throw new Error("Canvas falhou ou voltou vazio");
+            }
+        } catch (error) {
+            // Plano B: Backup Rápido (URL.createObjectURL)
+            // Se o canvas travar (comum em JPG de 10MB+ no iOS), usamos o arquivo bruto
+            console.warn("Canvas bloqueado ou falhou, usando backup bruto.", error);
+            const urlTemporaria = URL.createObjectURL(arquivoFoto);
+            imgElemento.src = urlTemporaria;
+            
+            // Gerencia memória: Revoga a URL quando carregar
+            imgElemento.onload = () => URL.revokeObjectURL(urlTemporaria);
         }
     } else {
+        // Plano C: Imagem padrão
         imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
-        imgElemento.style.display = "block";
     }
 
-    // Mostra o resultado
+    // Força a imagem a aparecer
+    imgElemento.style.display = "block";
+
+    // Mostra o resultado na tela
     document.querySelector('.container').classList.add('hidden');
     document.querySelector('header').classList.add('hidden');
     document.getElementById('resultado').classList.remove('hidden');
 
-    // Configura botões
+    // Configura botões (Igual antes)
     document.getElementById('btnWhatsapp').onclick = () => compartilharCartao(nomeMae, mensagem);
     document.getElementById('btnApoiar').onclick = () => document.getElementById('modalPix').classList.remove('hidden');
 }
 
-// FUNÇÃO DE COMPARTILHAR
+// CONVERSOR RESILIENTE (Com tratamento de erro rigoroso)
+function converterParaJpegResiliente(arquivo) {
+    return new Promise((resolve, reject) => {
+        // Tempo limite de 5 segundos para não travar o site
+        const timeout = setTimeout(() => reject("Tempo limite de conversão excedido"), 5000);
+
+        const leitor = new FileReader();
+        leitor.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                clearTimeout(timeout); // Limpa o tempo limite se der certo
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Redimensiona agressivamente para garantir que o Canvas abra no celular (max 600px)
+                const escala = Math.min(1, 600 / Math.max(img.width, img.height));
+                canvas.width = img.width * escala;
+                canvas.height = img.height * escala;
+
+                // Tenta desenhar. Se falhar aqui, o 'catch' da exibirCartao pega.
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Qualidade baixa (0.6) para garantir leveza
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
+            };
+            img.onerror = () => { clearTimeout(timeout); reject("Erro ao carregar Image()"); };
+            img.src = e.target.result;
+        };
+        leitor.onerror = () => { clearTimeout(timeout); reject("Erro no FileReader"); };
+        leitor.readAsDataURL(arquivo);
+    });
+}
+
+// (Função compartilharCartao e fecharModal continuam iguais)
 async function compartilharCartao(nomeMae, mensagem) {
     const imagemElement = document.getElementById('fotoExibida');
     const linkSite = window.location.href;
@@ -97,32 +141,4 @@ async function compartilharCartao(nomeMae, mensagem) {
         window.open(`https://api.whatsapp.com/send?text=Veja meu cartão: ${linkSite}`);
     }
 }
-
-// FUNÇÃO TRABALHADORA: CONVERSOR (A que resolve o bug do JPG/iPhone)
-function converterParaJpeg(arquivo) {
-    return new Promise((resolve, reject) => {
-        const leitor = new FileReader();
-        leitor.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                // Redimensiona para não travar o celular (max 800px)
-                const escala = Math.min(1, 800 / Math.max(img.width, img.height));
-                canvas.width = img.width * escala;
-                canvas.height = img.height * escala;
-
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.7));
-            };
-            img.onerror = reject;
-            img.src = e.target.result;
-        };
-        leitor.onerror = reject;
-        leitor.readAsDataURL(arquivo);
-    });
-}
-
-// Global para fechar o modal
 window.fecharModal = () => document.getElementById('modalPix').classList.add('hidden');
