@@ -273,3 +273,22 @@ input:focus {
         transform: translateY(0);
     }
 }
+
+/* Força a imagem a aparecer, não importa o que aconteça */
+#fotoExibida {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    max-width: 300px !important;
+    min-height: 200px !important;
+    background-color: #f0f0f0 !important; /* Se ficar um quadrado cinza, o erro é no JS. Se nem o cinza aparecer, o erro é no HTML/CSS. */
+    margin: 15px auto !important;
+    border: 2px solid pink !important; /* Borda temporária para sabermos onde ela deveria estar */
+}
+
+/* Garante que o container de resultado não corte a imagem */
+#resultado {
+    display: block !important;
+    overflow: visible !important;
+}
