@@ -165,28 +165,24 @@ input:focus {
     margin: 20px auto; /* Centraliza o próprio cartão na tela */
 }
 
-/* 2. Depois, formatamos a imagem */
+/* Força a imagem a aparecer, não importa o que aconteça */
 #fotoExibida {
-    width: 100%; /* Ocupa toda a largura disponível do cartão */
-    max-width: 350px; /* Mas não deixa passar desse tamanho */
-    height: auto;         /* Mantém a proporção */
-    
-    object-fit: cover; /* MÁGICA: A foto preenche o espaço sem distorcer, cortando as bordas se necessário */
-    object-position: center; /* Mantém o centro da foto visível */
-    
-    border-radius: 12px; /* Cantos arredondados na foto */
-    border: 4px solid #fff; /* Uma borda branca, como uma foto Polaroid */
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    
-    margin-bottom: 20px; /* Dá espaço para o texto abaixo */
-    display: block; /* Garante que ela seja tratada como um bloco */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    max-width: 300px !important;
+    min-height: 200px !important;
+    background-color: #f0f0f0 !important; /* Se ficar um quadrado cinza, o erro é no JS. Se nem o cinza aparecer, o erro é no HTML/CSS. */
+    margin: 15px auto !important;
+    border: 2px solid pink !important; /* Borda temporária para sabermos onde ela deveria estar */
 }
 
-    /* 3. Centraliza o texto */
-.texto-cartao {
-    text-align: center; /* Centraliza o título e o poema */
+/* Garante que o container de resultado não corte a imagem */
+#resultado {
+    display: block !important;
+    overflow: visible !important;
 }
-
 
 .texto-cartao p {
     font-style: italic;
@@ -274,21 +270,3 @@ input:focus {
     }
 }
 
-/* Força a imagem a aparecer, não importa o que aconteça */
-#fotoExibida {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    width: 100% !important;
-    max-width: 300px !important;
-    min-height: 200px !important;
-    background-color: #f0f0f0 !important; /* Se ficar um quadrado cinza, o erro é no JS. Se nem o cinza aparecer, o erro é no HTML/CSS. */
-    margin: 15px auto !important;
-    border: 2px solid pink !important; /* Borda temporária para sabermos onde ela deveria estar */
-}
-
-/* Garante que o container de resultado não corte a imagem */
-#resultado {
-    display: block !important;
-    overflow: visible !important;
-}
