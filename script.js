@@ -24,22 +24,25 @@ formulario.addEventListener('submit', async function (evento) {
     botao.disabled = true;
 
     try {
-        const prompt = `Escreva uma mensagem de Dia das Mães para ${nomeMae}. Ela gosta de ${estilo}. O tom deve ser ${tom}. Máximo 3 linhas.`;
+    // Chamamos a NOSSA ponte em vez do Google
+    const respostaServidor = await fetch('/api/gerar-cartao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nomeMae, estilo, tom })
+    });
 
-        // Chamada direta para o modelo que definimos no topo
-        const resultadoIA = await modelo.generateContent(prompt);
-        const resposta = await resultadoIA.response;
-        const textoGerado = resposta.text();
-
-        exibirCartao(nomeMae, textoGerado, arquivoFoto);
-
-    } catch (erro) {
-        console.error("Erro detalhado:", erro);
-        alert("A IA teve um probleminha. Verifique sua chave ou conexão.");
-    } finally {
-        botao.disabled = false;
-        botao.innerText = "Gerar Cartão com IA";
+    const dados = await respostaServidor.json();
+    
+    if (dados.texto) {
+        exibirCartao(nomeMae, dados.texto, arquivoFoto);
+    } else {
+        throw new Error("Erro na resposta");
     }
+
+} catch (erro) {
+    console.error("Erro:", erro);
+    alert("Houve um erro ao gerar o cartão.");
+}
 });
 
 // O segundo item aqui deve se chamar "mensagem" para combinar com o código lá de dentro
