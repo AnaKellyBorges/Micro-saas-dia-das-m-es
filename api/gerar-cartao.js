@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
     // Pega a chave que você vai cadastrar na Vercel
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const { nomeMae, estilo, tom } = req.body;
 
