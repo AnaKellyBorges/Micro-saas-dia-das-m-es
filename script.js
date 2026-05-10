@@ -2,7 +2,6 @@
 // 1. Primeiro, capturamos o formulário pelo ID que está no seu HTML
 const formulario = document.getElementById('cardForm');
 
-// 2. Agora o seu código vai entender o que é "formulario"
 formulario.addEventListener('submit', async function (evento) {
     evento.preventDefault();
 
@@ -10,7 +9,6 @@ formulario.addEventListener('submit', async function (evento) {
     const nomeMae = document.getElementById('nomeMae').value;
     const estilo = document.getElementById('estilo').value;
     const tom = document.querySelector('input[name="tom"]:checked').value;
-    // Captura o arquivo usando o novo ID do campo de upload
     const arquivoFoto = document.getElementById('fotoUpload').files[0];
 
     const botao = document.querySelector('.btn-gerar');
@@ -18,73 +16,63 @@ formulario.addEventListener('submit', async function (evento) {
     botao.disabled = true;
 
     try {
-    // Chamamos a NOSSA ponte em vez do Google
-    const respostaServidor = await fetch('/api/gerar-cartao', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nomeMae, estilo, tom })
-    });
+        // Chamada para a sua API na Vercel
+        const respostaServidor = await fetch('/api/gerar-cartao', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nomeMae, estilo, tom })
+        });
 
-    const dados = await respostaServidor.json();
-    
-    if (dados.texto) {
-        exibirCartao(nomeMae, dados.texto, arquivoFoto);
-    } else {
-        throw new Error("Erro na resposta");
+        // Verificação de erro para evitar o "Unexpected end of JSON"
+        if (!respostaServidor.ok) throw new Error("Erro na comunicação com o servidor");
+
+        const dados = await respostaServidor.json();
+        
+        if (dados.texto) {
+            exibirCartao(nomeMae, dados.texto, arquivoFoto);
+        } else {
+            throw new Error("Erro na resposta");
+        }
+
+    } catch (erro) {
+        console.error("Erro:", erro);
+        alert("Houve um erro ao gerar o cartão. Tente novamente!");
+    } finally {
+        botao.innerText = "Gerar Cartão com IA";
+        botao.disabled = false;
     }
-
-} catch (erro) {
-    console.error("Erro:", erro);
-    alert("Houve um erro ao gerar o cartão.");
-}
 });
 
-// O segundo item aqui deve se chamar "mensagem" para combinar com o código lá de dentro
 function exibirCartao(nomeMae, mensagem, arquivoFoto) {
-    // 1. Esconde o que não precisa e mostra o resultado
+    // Esconde o formulário e mostra o resultado
     document.querySelector('.container').classList.add('hidden');
     document.querySelector('header').classList.add('hidden');
     document.getElementById('resultado').classList.remove('hidden');
 
-    // 2. Coloca o texto da IA no cartão
     document.getElementById('poemaGerado').innerText = mensagem;
 
-    // 3. Pega o elemento correto onde a foto vai aparecer
     const imgElemento = document.getElementById('fotoExibida');
 
-    if (!imgElemento) {
-        console.error("ERRO: O JavaScript não encontrou o elemento 'fotoExibida'.");
-        return;
-    }
-
-    // 4. Lógica da Foto (Onde estava o erro)
+    // CORREÇÃO DO BUG DA IMAGEM:
     if (arquivoFoto) {
-        // Se existe um arquivo, precisamos do FILEREADER para lê-lo
         const leitor = new FileReader();
-
         leitor.onload = function (e) {
-            const campoImagem = document.getElementById('fotoExibida');
+            // AQUI ESTAVA O ERRO: Faltava atribuir o resultado ao src
+            imgElemento.src = e.target.result;
             imgElemento.style.display = "block";
         };
-
         leitor.readAsDataURL(arquivoFoto);
     } else {
-        // Se a pessoa NÃO subiu foto, aí sim usamos a reserva
+        // Imagem padrão caso não envie foto
         imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
+        imgElemento.style.display = "block";
     }
-    // Pega os botões
+
+    // CONFIGURAÇÃO DO BOTÃO WHATSAPP (COM IMAGEM + LINK)
     const btnZap = document.getElementById('btnWhatsapp');
+    btnZap.onclick = () => compartilharCartao(nomeMae, mensagem);
 
-    // Prepara o texto para o link (remove espaços e caracteres especiais)
-    const textoParaCompartilhar = window.encodeURIComponent(`Olha o cartão que fiz para você, ${nomeMae}: \n\n${mensagem}`);
-
-    // Configura o link do WhatsApp
-    btnZap.onclick = function () {
-        const urlZap = `https://api.whatsapp.com/send?text=${textoParaCompartilhar}`;
-        window.open(urlZap, '_blank');
-    };
-    // para fazer pagamentos por modalPix
-
+    // CONFIGURAÇÃO DO MODAL PIX
     const btnApoiar = document.getElementById('btnApoiar');
     const modal = document.getElementById('modalPix');
 
@@ -92,28 +80,32 @@ function exibirCartao(nomeMae, mensagem, arquivoFoto) {
     window.fecharModal = () => modal.classList.add('hidden');
 }
 
-async function compartilharCartao() {
-    // 1. Pegamos a imagem que está no seu cartão (em formato Blob ou arquivo)
-    const imagemElement = document.getElementById('fotoGerada'); // Onde a foto aparece no cartão
+// FUNÇÃO DE COMPARTILHAR CORRIGIDA
+async function compartilharCartao(nomeMae, mensagem) {
+    const imagemElement = document.getElementById('fotoExibida'); // ID CORRIGIDO AQUI
+    const linkSite = window.location.href;
     
     try {
-        // Transformamos a imagem do cartão em um arquivo real para o sistema
+        // 1. Prepara a imagem
         const resposta = await fetch(imagemElement.src);
         const blob = await resposta.blob();
         const arquivo = new File([blob], 'cartao-mae.png', { type: blob.type });
 
-        // 2. Verificamos se o navegador suporta compartilhamento de arquivos
+        // 2. Tenta o compartilhamento nativo (com foto e link)
         if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
             await navigator.share({
-                title: 'Cartão de Dia das Mães',
-                text: `Olha o cartão que fiz para você! Gerado em: ${window.location.href}`, // Seu link automático
+                title: `Cartão para ${nomeMae}`,
+                text: `${mensagem}\n\nGerado em: ${linkSite}`,
                 files: [arquivo]
             });
         } else {
-            // Caso o navegador seja antigo, fazemos o compartilhamento só de texto como backup
-            window.open(`https://wa.me/?text=Olha o cartão que fiz no site: ${window.location.href}`);
+            // Backup apenas texto se o navegador não suportar arquivos
+            const textoZap = window.encodeURIComponent(`Olha o cartão que fiz para você, ${nomeMae}!\n\n${mensagem}\n\nCrie o seu em: ${linkSite}`);
+            window.open(`https://api.whatsapp.com/send?text=${textoZap}`, '_blank');
         }
     } catch (err) {
         console.error("Erro ao compartilhar:", err);
+        alert("Não foi possível compartilhar a imagem. Enviando apenas o link.");
+        window.open(`https://api.whatsapp.com/send?text=Veja meu cartão: ${linkSite}`);
     }
 }
