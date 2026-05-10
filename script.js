@@ -134,4 +134,4 @@ async function compartilharCartao(nomeMae, mensagem) {
         window.open(`https://api.whatsapp.com/send?text=Veja meu cartão: ${linkSite}`);
     }
 }
-window.fecharModal = () => document.getElementById('modalPix').classList.add('hidden');}
+window.fecharModal = () => document.getElementById('modalPix').classList.add('hidden');
