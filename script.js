@@ -79,13 +79,13 @@ async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
     }
 
     if (telaResult) {
-        telaResult.classList.remove('hidden');
+        telaResult.classList.remove('escondido');
         telaResult.style.display = 'flex'; // Faz o cartão aparecer centralizado
         telaResult.scrollIntoView({ behavior: 'smooth' }); // Faz a tela subir para o topo do cartão
 
     // Configura botões (Igual antes)
     document.getElementById('btnWhatsapp').onclick = () => compartilharCartao(nomeMae, mensagem);
-    document.getElementById('btnApoiar').onclick = () => document.getElementById('modalPix').classList.remove('hidden');
+    document.getElementById('btnApoiar').onclick = () => document.getElementById('modalPix').classList.remove('escondido');
 }
 
 // CONVERSOR RESILIENTE (Com tratamento de erro rigoroso)
