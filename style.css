@@ -142,7 +142,8 @@ input:focus {
 
 }
 
-#resultado {
+#resultado .hidden {
+    display: none !important;
     margin-top: 30px;
     text-align: center;
     animation: fadeIn 0.8s ease-in;

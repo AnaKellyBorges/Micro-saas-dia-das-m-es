@@ -71,13 +71,23 @@ async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
         imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
     }
 
-    // Força a imagem a aparecer
-    imgElemento.style.display = "block";
+   // 1. Esconde com força total a área do formulário e o cabeçalho
+const containerForm = document.querySelector('.container');
+const header = document.querySelector('header');
 
-    // Mostra o resultado na tela
-    document.querySelector('.container').classList.add('hidden');
-    document.querySelector('header').classList.add('hidden');
-    document.getElementById('resultado').classList.remove('hidden');
+if (containerForm) {
+    containerForm.style.display = 'none'; // Remove do layout
+}
+if (header) {
+    header.style.display = 'none'; // Remove do layout
+}
+
+// 2. Mostra a seção de resultado
+const secaoResultado = document.getElementById('resultado');
+if (secaoResultado) {
+    secaoResultado.classList.remove('hidden');
+    secaoResultado.style.display = 'block'; // Garante que apareça
+}
 
     // Configura botões (Igual antes)
     document.getElementById('btnWhatsapp').onclick = () => compartilharCartao(nomeMae, mensagem);
