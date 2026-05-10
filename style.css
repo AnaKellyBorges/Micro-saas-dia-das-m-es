@@ -6,6 +6,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .tudo {
+    display: flex; 
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -97,6 +98,7 @@ input:focus {
     display: flex;
     gap: 15px;
     font-size: 0.9rem;
+    justify-content: center;
 }
 
 /* Botão Principal */
@@ -136,22 +138,21 @@ input:focus {
     }
 }
 
-/* Esconde a seção até que o cartão seja gerado */
+/* Isso esconde QUALQUER elemento que tenha a classe hidden */
 .hidden {
     display: none !important;
-
 }
 
-#resultado .hidden {
-    display: none !important;
+/* Remova ou comente o bloco antigo do #resultado .hidden */
+
+/* Estilo do resultado quando ele estiver VISÍVEL */
+#resultado {
     margin-top: 30px;
     text-align: center;
     animation: fadeIn 0.8s ease-in;
-    /* Efeito suave de aparecer */
     justify-content: center;
-
+    width: 100%;
 }
-
 .cartao-gerado {
     
 /* 1. Primeiro, centralizamos o conteúdo do cartão */
