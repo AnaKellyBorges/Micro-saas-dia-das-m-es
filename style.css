@@ -1,0 +1,275 @@
+/* Configurações Gerais */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.tudo {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 400px;
+    /* Limita a largura para parecer um app de celular */
+
+    
+}
+
+body {
+    background-color: #fff5f7;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+
+}
+
+.container {
+    align-items: center;
+    flex-direction: column;
+    /* FORÇA ficar um embaixo do outro */
+    width: 100%;
+    max-width: 400px;
+    /* Limita a largura para parecer um app de celular */
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+
+}
+
+/* Cabeçalho */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: #d63384;
+    /* Rosa mais forte */
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 0.9rem;
+    color: #363636;
+}
+
+/* Formulário */
+.input-group {
+    margin-bottom: 20px;
+    text-align: center;
+    
+}
+
+.mensagem {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+input[type="text"],
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+}
+
+/* O input:focus é o que chamamos de Pseudo-classe. Ele é usado para estilizar um elemento apenas no momento exato em que ele está "em foco" — ou seja, quando o usuário clica ou toca nele para começar a digitar.*/
+input:focus {
+    border-color: #d63384;
+}
+
+/* Grupo de botões de rádio */
+.radio-group {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9rem;
+}
+
+/* Botão Principal */
+.btn-gerar {
+    width: 100%;
+    padding: 15px;
+    background-color: #d63384;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-gerar:hover {
+    background-color: #b02a6a;
+}
+
+/* Quando a tela for maior que 768px (tablets e computadores) */
+@media (min-width: 768px) {
+    body {
+        /* O 'vh' significa Viewport Height. 100vh é a altura total da tela. */
+        min-height: 100vh;
+
+        /* Alinha o conteúdo exatamente no centro vertical */
+        align-items: center;
+
+        /* Remove o padding excessivo do topo que usamos no mobile */
+        padding: 0;
+    }
+
+    .container {
+        /* Dá um ar mais profissional com uma sombra um pouco mais forte no PC */
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Esconde a seção até que o cartão seja gerado */
+.hidden {
+    display: none !important;
+
+}
+
+#resultado {
+    margin-top: 30px;
+    text-align: center;
+    animation: fadeIn 0.8s ease-in;
+    /* Efeito suave de aparecer */
+    justify-content: center;
+
+}
+
+.cartao-gerado {
+/* 1. Primeiro, centralizamos o conteúdo do cartão */
+    display: flex; /* Ativa o modo de layout flexível */
+    flex-direction: column; /* Organiza os itens em coluna (imagem em cima, texto embaixo) */
+    align-items: center; /* Centraliza todos os itens na horizontal */
+    justify-content: center; /* Centraliza na vertical, se houver espaço */
+    padding: 20px;
+    background-color: #fff; /* Fundo branco para o cartão (ou sua cor Cyberpunk) */
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Uma sombra leve */
+    max-width: 400px; /* Largura máxima do cartão */
+    margin: 20px auto; /* Centraliza o próprio cartão na tela */
+}
+
+/* 2. Depois, formatamos a imagem */
+#fotoExibida {
+    width: 100%; /* Ocupa toda a largura disponível do cartão */
+    max-width: 350px; /* Mas não deixa passar desse tamanho */
+    height: 350px; /* Força uma altura (pode mudar para ficar quadrado ou retangular) */
+    
+    object-fit: cover; /* MÁGICA: A foto preenche o espaço sem distorcer, cortando as bordas se necessário */
+    object-position: center; /* Mantém o centro da foto visível */
+    
+    border-radius: 12px; /* Cantos arredondados na foto */
+    border: 4px solid #fff; /* Uma borda branca, como uma foto Polaroid */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    
+    margin-bottom: 20px; /* Dá espaço para o texto abaixo */
+    display: block; /* Garante que ela seja tratada como um bloco */
+}
+
+    /* 3. Centraliza o texto */
+.texto-cartao {
+    text-align: center; /* Centraliza o título e o poema */
+}
+
+
+.texto-cartao p {
+    font-style: italic;
+    line-height: 1.6;
+    color: #555;
+}
+.btn-compartilhar {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-compartilhar:hover {
+    transform: scale(1.05);
+}
+
+.zap {
+    background-color: #25D366; /* Verde do WhatsApp */
+}
+.btn-apoio {
+    background-color: #ffdd00;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    box-shadow: 0 4px 10px rgba(255, 221, 0, 0.3);
+}
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal-conteudo {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.pix-box {
+    background: #f0f0f0;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 10px;
+    border: 2px dashed #ccc;
+}
+
+.btn-voltar {
+    background-color: #25D366;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.btn-voltar:hover {
+    transform: scale(1.05);
+}
+
+
+/* Animação para o cartão aparecer */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Dia das Mães</title>
+
+</head>
+
+<body>
+    <div class="tudo">
+        <div class="container">
+            <header>
+                <h1>Presente Especial 🌸</h1>
+                <p>Crie um cartão único para sua mãe em segundos.</p>
+
+            </header>
+
+            <main>
+                <form id="cardForm"> <!-- É a tag que define um formulário.-->
+                    <!-- Campo para o Nome -->
+                    <div class="input-group">
+                        <label for="nomeMae">Nome da Mãe</label>
+                        <input type="text" id="nomeMae" placeholder="Ex: Maria Silva" required>
+                        <!-- A palavra inglesa required significa "obrigatório". Quando você a coloca dentro de uma tag <input>, você está dizendo ao navegador: "Ei, não deixe o usuário enviar este formulário se este campo estiver vazio!"-->
+                        <!-- Os <input> e <select> (campos de nome e estilo) são os papéis que você coloca dentro do envelope.-->
+                    </div>
+                    <!-- Campo para Características -->
+                    <div class="input-group">
+                        <label for="estilo">O que ela mais gosta?</label>
+                        <!-- a tag <label> (rótulo) serve para dar um nome a um campo.-->
+                        <select id="estilo">
+                            <option value="" disabled selected>Escolha o estilo dela...</option>
+                            <option value="flores">Flores e Jardim</option>
+                            <option value="cafe">Café e Livros</option>
+                            <option value="cozinhar">Cozinhar em Família</option>
+                            <option value="viagem">Viajar e Aventuras</option>
+                            <option value="musica">Ouvir Música e Dançar</option>
+                            <option value="filmes">Cinema e Séries</option>
+                        </select>
+                        <div class="campo">
+                            <label for="fotoUpload">Escolha uma foto da sua mãe:</label>
+                            <input type="file" id="fotoUpload" accept="image/*">
+                        </div>
+                    </div>
+                    <!-- Campo para o Tom da Mensagem -->
+                    <div class="input-group">
+                        <span class="mensagem">Tom da Mensagem</span>
+
+                        <div class="radio-group">
+                            <!-- type="radio" Isso define o tipo do campo. O Radio é aquele botão circular que só permite escolher uma única opção dentro de um grupo.-->
+                            <label><input type="radio" name="tom" value="emocionante" checked> Emocionante</label>
+                            <label><input type="radio" name="tom" value="engracado"> Engraçado</label>
+                            <label><input type="radio" name="tom" value="Poetico"> Poético</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-gerar">Gerar Cartão com IA</button>
+                </form>
+            </main>
+        </div>
+
+        <!-- Área onde o resultado será exibido -->
+
+        <section id="resultado" class="hidden">
+            <div class="cartao-gerado" id="cartaoConteudo">
+                <img src="" id="fotoExibida" alt="Imagem do cartão">
+                <div class="texto-cartao">
+                    <h2 id="tituloCartao">Para você, Mãe</h2>
+                    <p id="poemaGerado"></p>
+                </div>
+            </div>
+
+            <button id="btnWhatsapp" class="btn-compartilhar zap">Compartilhar no WhatsApp</button>
+            <button onclick="location.reload()" class="btn-voltar">Criar outro</button>
+
+            <div class="apoio-secao">
+                <button id="btnApoiar" class="btn-apoio">☕ Pague um café para a desenvolvedora</button>
+            </div>
+
+            <div id="modalPix" class="modal hidden">
+                <div class="modal-conteudo">
+                    <h3>Gostou do cartão? 🌸</h3>
+                    <p>Contribua com qualquer valor acima de 1R$ para manter o projeto online!</p>
+                    <div class="pix-box">
+                        <strong>Chave PIX:</strong> <span>162f0a82-8e3c-41a5-88d1-961cd8d890a6</span>
+                    </div>
+                    <button onclick="fecharModal()" class="btn-fechar">Fechar</button>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- 1. O mapa que ensina o caminho da biblioteca -->
+    <script type="importmap">
+{
+  "imports": {
+    "@google/generative-ai": "https://esm.run/@google/generative-ai@0.11.4"
+  }
+}
+</script>
+
+    <!-- 2. O seu código que usa a biblioteca -->
+    <script type="module" src="script.js"></script>
+
+</body>
+
+</html>
