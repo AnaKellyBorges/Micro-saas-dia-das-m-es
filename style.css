@@ -170,7 +170,7 @@ input:focus {
 /* Força a imagem a aparecer, não importa o que aconteça */
 #fotoExibida {
     display: block !important;
-    visibility: visible !important;
+    
     opacity: 1 !important;
     width: 100% !important;
     max-width: 300px !important;
@@ -183,15 +183,17 @@ input:focus {
 /* Garante que o container de resultado não corte a imagem */
 #resultado {
     display: block !important;
-    overflow: visible !important;
+    
 }
 
 .texto-cartao p {
+    
     font-style: italic;
     line-height: 1.6;
     color: #555;
 }
 .btn-compartilhar {
+    
     padding: 10px 20px;
     border: none;
     border-radius: 8px;
