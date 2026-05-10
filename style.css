@@ -141,12 +141,7 @@ input:focus {
     }
 }
 
-/* Isso esconde QUALQUER elemento que tenha a classe hidden */
-.hidden {
-    display: none !important;
-}
 
-/* Remova ou comente o bloco antigo do #resultado .hidden */
 
 /* Estilo do resultado quando ele estiver VISÍVEL */
 #resultado {
