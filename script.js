@@ -45,16 +45,16 @@ async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
 
     poemaElemento.innerText = mensagem;
 
-  if (arquivoFoto) {
+    if (arquivoFoto) {
         try {
             console.log("Iniciando sanitização com limite de tempo...");
-            
+
             // Corrida: Se o conversor demorar mais de 3s, ele pula pro 'catch'
             const fotoProcessada = await Promise.race([
                 converterParaJpeg(arquivoFoto),
                 new Promise((_, reject) => setTimeout(() => reject("Tempo esgotado"), 3000))
             ]);
-            
+
             imgElemento.src = fotoProcessada;
         } catch (erro) {
             console.warn("Canvas falhou ou demorou. Usando backup.", erro);
@@ -72,10 +72,10 @@ async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
     if (telaEntrada) {
         telaEntrada.style.setProperty('display', 'none', 'important');
     }
-    
+
     if (telaResultado) {
-        telaResultado.classList.remove('hidden');
-        telaResultado.style.setProperty('display', 'block', 'important');
+        const wrapper = document.getElementById('resultadoWrapper');
+        wrapper.classList.remove('escondido');
     }
     // Configura botões (Igual antes)
     document.getElementById('btnWhatsapp').onclick = () => compartilharCartao(nomeMae, mensagem);
@@ -134,4 +134,4 @@ async function compartilharCartao(nomeMae, mensagem) {
         window.open(`https://api.whatsapp.com/send?text=Veja meu cartão: ${linkSite}`);
     }
 }
-window.fecharModal = () => document.getElementById('modalPix').classList.add('hidden');
+window.fecharModal = () => document.getElementById('modalPix').classList.add('escondido');

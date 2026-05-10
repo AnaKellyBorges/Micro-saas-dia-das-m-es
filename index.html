@@ -26,7 +26,7 @@
 
                     <div class="input-group">
                         <label for="estilo">O que ela mais gosta?</label>
-                        <select id="estilo">
+                        <select id="estilo" required>>
                             <option value="" disabled selected>Escolha o estilo dela...</option>
                             <option value="flores">Flores e Jardim</option>
                             <option value="cafe">Café e Livros</option>
@@ -55,7 +55,7 @@
                 </form>
             </main>
         </div>
-        <div class="escondido">
+        <div id="resultadoWrapper" class="escondido">
             <section id="resultado" >
                 <div class="cartao-gerado">
                     <img id="fotoExibida"
@@ -91,15 +91,7 @@
         </div>
     </div>
 
-
-
-    <script type="importmap">
-    {
-      "imports": {
-        "@google/generative-ai": "https://esm.run/@google/generative-ai@0.11.4"
-      }
-    }
-    </script>
+    
     <script type="module" src="script.js"></script>
 </body>
 
