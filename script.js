@@ -63,7 +63,7 @@ function exibirCartao(nomeMae, mensagem, arquivoFoto) {
         const leitor = new FileReader();
 
         leitor.onload = function (e) {
-            imgElemento.src = e.target.result; // Aqui a foto aparece!
+            minhaImagemExibida.src = e.target.result; // Isso funciona para qualquer formato que o navegador entenda.
             imgElemento.style.display = "block";
         };
 
