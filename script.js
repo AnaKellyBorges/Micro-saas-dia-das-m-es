@@ -92,3 +92,28 @@ function exibirCartao(nomeMae, mensagem, arquivoFoto) {
     window.fecharModal = () => modal.classList.add('hidden');
 }
 
+async function compartilharCartao() {
+    // 1. Pegamos a imagem que está no seu cartão (em formato Blob ou arquivo)
+    const imagemElement = document.getElementById('fotoGerada'); // Onde a foto aparece no cartão
+    
+    try {
+        // Transformamos a imagem do cartão em um arquivo real para o sistema
+        const resposta = await fetch(imagemElement.src);
+        const blob = await resposta.blob();
+        const arquivo = new File([blob], 'cartao-mae.png', { type: blob.type });
+
+        // 2. Verificamos se o navegador suporta compartilhamento de arquivos
+        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+            await navigator.share({
+                title: 'Cartão de Dia das Mães',
+                text: `Olha o cartão que fiz para você! Gerado em: ${window.location.href}`, // Seu link automático
+                files: [arquivo]
+            });
+        } else {
+            // Caso o navegador seja antigo, fazemos o compartilhamento só de texto como backup
+            window.open(`https://wa.me/?text=Olha o cartão que fiz no site: ${window.location.href}`);
+        }
+    } catch (err) {
+        console.error("Erro ao compartilhar:", err);
+    }
+}
