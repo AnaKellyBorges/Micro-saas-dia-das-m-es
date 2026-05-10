@@ -24,7 +24,7 @@ formulario.addEventListener('submit', async function (evento) {
         if (!respostaServidor.ok) throw new Error("Erro na API");
 
         const dados = await respostaServidor.json();
-        
+
         if (dados.texto) {
             // Chamamos a exibição com 'await' para segurar o loading
             await exibirCartao(nomeMae, dados.texto, arquivoFoto);
@@ -62,7 +62,7 @@ async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
             console.warn("Canvas bloqueado ou falhou, usando backup bruto.", error);
             const urlTemporaria = URL.createObjectURL(arquivoFoto);
             imgElemento.src = urlTemporaria;
-            
+
             // Gerencia memória: Revoga a URL quando carregar
             imgElemento.onload = () => URL.revokeObjectURL(urlTemporaria);
         }
@@ -71,23 +71,17 @@ async function exibirCartao(nomeMae, mensagem, arquivoFoto) {
         imgElemento.src = "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500";
     }
 
-   // 1. Esconde com força total a área do formulário e o cabeçalho
-const containerForm = document.querySelector('.container');
-const header = document.querySelector('header');
+    const telaForm = document.getElementById('tela-formulario');
+    const telaResult = document.getElementById('resultado');
 
-if (containerForm) {
-    containerForm.style.display = 'none'; // Remove do layout
-}
-if (header) {
-    header.style.display = 'none'; // Remove do layout
-}
+    if (telaForm) {
+        telaForm.style.display = 'none'; // Some com o formulário e o título
+    }
 
-// 2. Mostra a seção de resultado
-const secaoResultado = document.getElementById('resultado');
-if (secaoResultado) {
-    secaoResultado.classList.remove('hidden');
-    secaoResultado.style.display = 'block'; // Garante que apareça
-}
+    if (telaResult) {
+        telaResult.classList.remove('hidden');
+        telaResult.style.display = 'flex'; // Faz o cartão aparecer centralizado
+        telaResult.scrollIntoView({ behavior: 'smooth' }); // Faz a tela subir para o topo do cartão
 
     // Configura botões (Igual antes)
     document.getElementById('btnWhatsapp').onclick = () => compartilharCartao(nomeMae, mensagem);
@@ -107,7 +101,7 @@ function converterParaJpegResiliente(arquivo) {
                 clearTimeout(timeout); // Limpa o tempo limite se der certo
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                
+
                 // Redimensiona agressivamente para garantir que o Canvas abra no celular (max 600px)
                 const escala = Math.min(1, 600 / Math.max(img.width, img.height));
                 canvas.width = img.width * escala;
@@ -115,7 +109,7 @@ function converterParaJpegResiliente(arquivo) {
 
                 // Tenta desenhar. Se falhar aqui, o 'catch' da exibirCartao pega.
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                
+
                 // Qualidade baixa (0.6) para garantir leveza
                 resolve(canvas.toDataURL('image/jpeg', 0.6));
             };
@@ -131,7 +125,7 @@ function converterParaJpegResiliente(arquivo) {
 async function compartilharCartao(nomeMae, mensagem) {
     const imagemElement = document.getElementById('fotoExibida');
     const linkSite = window.location.href;
-    
+
     try {
         const resposta = await fetch(imagemElement.src);
         const blob = await resposta.blob();
@@ -151,4 +145,4 @@ async function compartilharCartao(nomeMae, mensagem) {
         window.open(`https://api.whatsapp.com/send?text=Veja meu cartão: ${linkSite}`);
     }
 }
-window.fecharModal = () => document.getElementById('modalPix').classList.add('hidden');
+window.fecharModal = () => document.getElementById('modalPix').classList.add('hidden');}

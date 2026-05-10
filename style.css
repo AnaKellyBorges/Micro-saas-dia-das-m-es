@@ -147,6 +147,7 @@ input:focus {
 
 /* Estilo do resultado quando ele estiver VISÍVEL */
 #resultado {
+    display: flex;
     margin-top: 30px;
     text-align: center;
     animation: fadeIn 0.8s ease-in;
