@@ -169,7 +169,7 @@ input:focus {
 #fotoExibida {
     width: 100%; /* Ocupa toda a largura disponível do cartão */
     max-width: 350px; /* Mas não deixa passar desse tamanho */
-    height: 350px; /* Força uma altura (pode mudar para ficar quadrado ou retangular) */
+    height: auto;         /* Mantém a proporção */
     
     object-fit: cover; /* MÁGICA: A foto preenche o espaço sem distorcer, cortando as bordas se necessário */
     object-position: center; /* Mantém o centro da foto visível */
