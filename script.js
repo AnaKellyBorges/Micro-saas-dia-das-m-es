@@ -1,5 +1,10 @@
 
 // --- script.js V3: Robusto para Produção ---
+import { inject } from '@vercel/analytics';
+
+// Initialize Vercel Web Analytics
+inject();
+
 const formulario = document.getElementById('cardForm');
 
 formulario.addEventListener('submit', async function (evento) {
